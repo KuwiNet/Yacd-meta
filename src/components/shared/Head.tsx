@@ -16,11 +16,11 @@ function HeadImpl({
   apiConfigs: any[];
 }) {
   React.useEffect(() => {
-    let title = 'yacd';
+    let title = 'ZWRT';
     if (apiConfigs.length > 1) {
       try {
         const host = new URL(apiConfig.baseURL).host;
-        title = `${host} - yacd`;
+        title = `${host} - ZWRT`;
       } catch (e) {
         // ignore
       }
