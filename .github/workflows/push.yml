@@ -28,3 +28,26 @@ jobs:
           fqdn: yacd.kuwi.net
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      # 新增步骤：拉取gh-pages分支内容
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          path: gh-pages-content
+      
+      # 新增步骤：打包gh-pages分支内容为ZIP
+      - name: Create gh-pages.zip
+        run: |
+          cd gh-pages-content
+          zip -r ../gh-pages.zip .
+      
+      # 新增步骤：上传ZIP到v1.8.8发行版
+      - name: Upload to Release v1.8.8
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.8.8
+          files: gh-pages.zip
+          overwrite: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
