@@ -48,13 +48,28 @@ jobs:
           mkdir -p temp/gh-pages
           cp -r gh-pages-content/* temp/gh-pages/
           cd temp
-          zip -r ../../gh-pages.zip . -x "*/.git*"
+          zip -r ../gh-pages.zip . -x "*/.git*"
+          ls -la ../gh-pages.zip
       
-      - name: Upload to Release v1.8.8
+      - name: Delete existing gh-pages.zip from release
+        run: |
+          release=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/v1.8.8")
+          asset_id=$(echo "$release" | jq -r '.assets[] | select(.name == "gh-pages.zip") | .id')
+          if [ "$asset_id" != "null" ] && [ -n "$asset_id" ]; then
+            echo "Deleting existing gh-pages.zip with asset ID: $asset_id"
+            curl -s -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id"
+          else
+            echo "No existing gh-pages.zip found in release"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload new gh-pages.zip to Release v1.8.8
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.8.8
-          files: gh-pages.zip
-          overwrite: true
+          files: ./gh-pages.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
