@@ -36,17 +36,17 @@ jobs:
           git_config_email: actions@github.com
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      
       - name: Checkout gh-pages branch
         uses: actions/checkout@v3
         with:
           ref: gh-pages
           path: gh-pages-content
       
-      - name: Create gh-pages.zip (excluding .git)
+      - name: Create gh-pages.zip (excluding .git and _headers)
         run: |
           cd gh-pages-content
-          zip -r ../gh-pages.zip . -x "*.git*"
+          zip -r ../gh-pages.zip . -x "*.git*" "_headers"
       
       - name: Upload to Release v1.8.8
         uses: softprops/action-gh-release@v2
