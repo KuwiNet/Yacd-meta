@@ -5,44 +5,49 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout Dashboard code
         uses: actions/checkout@v3
+      
       - uses: pnpm/action-setup@v2
         with:
           version: latest
+      
       - name: Setup Nodejs
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
           cache: pnpm
+      
       - name: Install package and build
         run: |
           pnpm install --no-frozen-lockfile
           pnpm build
+      
       - name: Deploy
         uses: crazy-max/ghaction-github-pages@v2
         with:
           target_branch: gh-pages
           build_dir: public
           fqdn: yacd.kuwi.net
+          git_config_name: GitHub Actions
+          git_config_email: actions@github.com
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      # 新增步骤：拉取gh-pages分支内容
+
       - name: Checkout gh-pages branch
         uses: actions/checkout@v3
         with:
           ref: gh-pages
           path: gh-pages-content
       
-      # 新增步骤：打包gh-pages分支内容为ZIP
-      - name: Create gh-pages.zip
+      - name: Create gh-pages.zip (excluding .git)
         run: |
           cd gh-pages-content
-          zip -r ../gh-pages.zip .
+          zip -r ../gh-pages.zip . -x "*.git*"
       
-      # 新增步骤：上传ZIP到v1.8.8发行版
       - name: Upload to Release v1.8.8
         uses: softprops/action-gh-release@v2
         with:
