@@ -43,10 +43,12 @@ jobs:
           ref: gh-pages
           path: gh-pages-content
       
-      - name: Create gh-pages.zip (excluding .git)
+      - name: Create gh-pages.zip with top-level directory
         run: |
-          cd gh-pages-content
-          zip -r ../gh-pages.zip . -x "*.git*"
+          mkdir -p temp/gh-pages
+          cp -r gh-pages-content/* temp/gh-pages/
+          cd temp
+          zip -r ../../gh-pages.zip . -x "*/.git*"
       
       - name: Upload to Release v1.8.8
         uses: softprops/action-gh-release@v2
